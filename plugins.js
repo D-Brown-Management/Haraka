@@ -13,6 +13,9 @@ const constants   = require('haraka-constants');
 // local modules
 const logger      = require('./logger');
 
+
+const pjson       = require(process.env.HARAKA+'/package.json');
+
 exports.registered_hooks = {};
 exports.registered_plugins = {};
 exports.plugin_list = [];
@@ -75,6 +78,18 @@ class Plugin {
             );
         }
 
+        // npm install'd deps with @scope/name
+        const keys = Object.keys(pjson.dependencies);
+        for (let i=0; i<keys.length; i++) {
+            if (/^@[A-Za-z]+\/haraka-plugin-/.test(keys[i])) {
+                //let subName = keys[i].replace(/^@[A-Za-z]+\/haraka-plugin-/,'');
+                if (keys[i] === name) {
+                    paths.push(
+                        path.resolve(process.env.HARAKA, 'node_modules', keys[i], 'package.json')
+                    );
+                }
+            }
+        }
         // development mode
         paths = paths.concat(plugin_search_paths(__dirname, name));
         paths.forEach(pp => {
