@@ -100,6 +100,9 @@ class Transaction {
             new_line = this.body.parse_more(new_line.toString(this.encoding).replace(/\r\n$/, '\n'));
 
             if (!new_line.length) return; // buffering for banners
+
+            new_line = new_line.replace(/^\./gm, '..').replace(/\r?\n/gm, '\r\n');
+            line = Buffer.from(new_line, this.encoding);
         }
 
         if (!this.discard_data) this.message_stream.add_line(line);
