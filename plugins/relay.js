@@ -189,18 +189,19 @@ exports.force_routing = function (next, hmail, domain) {
     if (!plugin.dest.domains) { return next(); }
     const route = plugin.dest.domains[domain];
     const forceAllHop = plugin.cfg.relay.forcenexthop;
+    plugin.loginfo('forcerouting found, trying to route using this.', plugin.cfg.relay);
+
+    if(!!forceAllHop) {
+        plugin.loginfo(plugin, 'force hop found!');
+        return next(OK, forceAllHop);   
+    }
 
     if (!route) {
         plugin.logdebug(plugin, `using normal MX lookup for: ${domain}`);
         return next();
     }
 
-    let nexthop = JSON.parse(route).nexthop;
-    if(!nexthop && !!forceAllHop) {
-        plugin.loginfo(plugin, 'force hop found!');
-        nextHop = forceAllHop;
-    }
-
+    let nexthop = JSON.parse(route).nexthop;    
     if (!nexthop) {
         plugin.logdebug(plugin, `using normal MX lookup for: ${domain}`);
         return next();
